@@ -116,18 +116,6 @@ class CommandProcessor():
     @throw CommandException if the variable does not exist, or if the vlaue is
             invalid.
     """
-    def __set(self, options: str):
-        if os.name == 'nt':  # Windows
-            os.system("cls")
-        else:  # POSIX
-            os.system("clear")
-
-    """
-    @brief Command to set exploit variables.
-    @param the variable to be set and the value, if any.
-    @throw CommandException if the variable does not exist, or if the vlaue is
-            invalid.
-    """
     def __clear(self, options: str):
         if os.name == 'nt':  # Windows
             os.system("cls")
@@ -143,15 +131,15 @@ class CommandProcessor():
     def __set(self, options: str):
         if len(options) == 0:  # list all variables
             print((f"{'{0: <20}'.format(f'VARIABLE')} "
-                   f"{'{0: <20}'.format('VALUE')} "
+                   f"{'{0: <50}'.format('VALUE')} "
                    f"REQUIRED"))
             for var in self.variables:
                 print((f"{'{0: <20}'.format(var)} "
-                       f"{'{0: <20}'.format(self.variables[var]['value'])} "
+                       f"{'{0: <50}'.format(self.variables[var]['value'])} "
                        f"{str(self.variables[var]['required']).upper()}"))
         else:
             split = options.split(" ", 1)
-            var = split[0]
+            var = split[0].upper()
             if var in self.variables:
                 value = ""
                 if len(split) > 1:
