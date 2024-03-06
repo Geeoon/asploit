@@ -89,7 +89,11 @@ class CommandProcessor():
     @param options Not used.
     """
     def __exploit(self, options: str):
-        print("Attempting to exploit target at ")
+        if (len(self.variables["TARGET"]) == 0 or
+            len(self.variables["TARGET_TYPE"]) == 0):
+            raise CommandException("TARGET or TARGET_TYPE not set.")
+        print((f"Attempting to exploit {self.variables['TARGET']} at "
+              f"{self.variables['TARGET_TYPE']}"))
         self.post = True
 
     """
