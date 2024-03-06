@@ -87,6 +87,8 @@ class CommandProcessor():
     """
     @brief Command to clear the screen.
     @param options Not used.
+    @pre the TARGET and TARGET_TYPE exploit variables have been set.
+    @throw CommandException if the pre-condition is not met.
     """
     def __exploit(self, options: str):
         if (len(self.variables["TARGET"]) == 0 or
