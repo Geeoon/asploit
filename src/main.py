@@ -51,6 +51,9 @@ class CommandProcessor():
             "TARGET_TYPE": "ASP"
         }
 
+        # have we successfully exploited yet?
+        self.post = False
+
     """
     @brief Help command that prints commands and their usage.
     @param options The specific command to display help for.
@@ -68,12 +71,18 @@ class CommandProcessor():
                 raise CommandException(f"    '{options}' command not found.")
 
     """
-    @brief Command to exit the program.
+    @brief Command to exit the program or the exploit shell.
     @throw ExitException to exit the program.
     @param options Not used.
     """
     def __exit(self, options: str):
-        raise ExitException()
+        if self.post:
+            # exit shell
+            self.post = False
+            print("Exiting exploit shell.")
+        else:
+            # exit program
+            raise ExitException()
     
     """
     @brief Command to clear the screen.
@@ -81,6 +90,7 @@ class CommandProcessor():
     """
     def __exploit(self, options: str):
         print("Attempting to exploit target at ")
+        self.post = True
 
     """
     @brief Command to set exploit variables.
@@ -149,6 +159,13 @@ class CommandProcessor():
         else:
             raise CommandException(
                 f"'{command.split(' ', 1)[0]}' command not found.")
+    
+    """
+    @brief Getter for exploit status (True or False)
+    @return bool for if we are in the exploit shell.
+    """
+    def expliot_status(self):
+        return self.post
 
 if __name__ == "__main__":
     processor = CommandProcessor()
@@ -156,7 +173,10 @@ if __name__ == "__main__":
         print("Welcome to ASPLOIT.")
         print("For help, type 'help'")
         while (True):
-            command = input("> ")
+            pre = ">"
+            if processor.expliot_status():
+                pre = "shell>"
+            command = input(pre)
             try:
                 processor.process_command(command)
             except CommandException as e:
@@ -164,6 +184,7 @@ if __name__ == "__main__":
     except ExitException:
         print("Exiting...")
     except KeyboardInterrupt:
+        print()
         print("Keyboard Interrupt")
     except Exception:
         print("Unrecoverable Exception: ")
