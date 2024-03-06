@@ -13,8 +13,16 @@ class CommandException(Exception):
     pass
 
 """
+@brief The ExploitProcessor class accepts commands passed into it and processes
+        it to be sent to the backdoored server.
+"""
+class ExploitProcessor():
+    def __init__(self):
+        self.directory = ""
+
+"""
 @brief The CommandProcessor class accepts commands passed into it and processes
-        it appropriately.
+        it appropriately to be ran on the client machine.
 """
 class CommandProcessor():
     """
@@ -47,8 +55,10 @@ class CommandProcessor():
 
         # exploit variables
         self.variables = {
-            "TARGET": "",
-            "TARGET_TYPE": "ASP"
+            "TARGET": {"value": "", "required": True},
+            "TARGET_TYPE": {"value": "ASP", "required": True},
+            "METHOD": {"value": "GET", "required": True},
+            "HEADER": {"value": "EXPLOIT", "required": True}
         }
 
         # have we successfully exploited yet?
@@ -91,11 +101,13 @@ class CommandProcessor():
     @throw CommandException if the pre-condition is not met.
     """
     def __exploit(self, options: str):
-        if (len(self.variables["TARGET"]) == 0 or
-            len(self.variables["TARGET_TYPE"]) == 0):
-            raise CommandException("TARGET or TARGET_TYPE not set.")
-        print((f"Attempting to exploit {self.variables['TARGET']} at "
-              f"{self.variables['TARGET_TYPE']}"))
+        for var in self.variables:
+            if (self.variables[var]["required"] and
+                len(self.variables[var]["value"]) == 0):
+                raise CommandException(f"{var} not set.")
+        print((f"Attempting to exploit {self.variables['TARGET']['value']} using "
+              f"{self.variables['TARGET_TYPE']['value']}"))
+        
         self.post = True
 
     """
@@ -130,9 +142,13 @@ class CommandProcessor():
     """
     def __set(self, options: str):
         if len(options) == 0:  # list all variables
-            print(f"{'{0: <20}'.format(f'VARIABLE')} VALUE")
+            print((f"{'{0: <20}'.format(f'VARIABLE')} "
+                   f"{'{0: <20}'.format('VALUE')} "
+                   f"REQUIRED"))
             for var in self.variables:
-                print(f"{'{0: <20}'.format(var)} {self.variables[var]}")
+                print((f"{'{0: <20}'.format(var)} "
+                       f"{'{0: <20}'.format(self.variables[var]['value'])} "
+                       f"{str(self.variables[var]['required']).upper()}"))
         else:
             split = options.split(" ", 1)
             var = split[0]
@@ -140,7 +156,7 @@ class CommandProcessor():
                 value = ""
                 if len(split) > 1:
                     value = split[1]
-                self.variables[var] = value
+                self.variables[var]["value"] = value
                 print(f"'{var}' set to '{value}'")
             else:
                 raise CommandException(f"'{var}' is not a variable.")
@@ -179,9 +195,9 @@ if __name__ == "__main__":
         print("Welcome to ASPLOIT.")
         print("For help, type 'help'")
         while (True):
-            pre = ">"
+            pre = " > "
             if processor.expliot_status():
-                pre = "shell>"
+                pre = "sploit > "
             command = input(pre)
             try:
                 processor.process_command(command)
