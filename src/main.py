@@ -265,7 +265,7 @@ class ExploitProcessor(CommandProcessor, ABC):
 """
 @brief The PHPExploitProcessor class is an abstract class that accepts commands
         passed into it and processes it to be sent to the backdoored PHP page.
-        Inherits from the CommandProcessor class. 
+        Inherits from the ExploitProcessor class. 
 """
 class PHPExploitProcessor(ExploitProcessor):
     def __init__(self, host: str, path: str, method: str, header: str):
