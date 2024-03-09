@@ -2,6 +2,7 @@ from Exceptions import *
 from CommandProcessor import CommandProcessor
 from ExploitProcessor import ExploitProcessor
 from PHPExploitProcessor import PHPExploitProcessor
+from NodeExploitProcessor import NodeExploitProcessor
 
 class LocalCommandProcessor(CommandProcessor):
     def __init__(self):
@@ -20,9 +21,9 @@ class LocalCommandProcessor(CommandProcessor):
             
         # exploit variables
         self.variables = {
-            "TARGET_HOST": {"value": "", "required": True},
+            "TARGET_HOST": {"value": "localhost:8000", "required": True},
             "TARGET_PATH": {"value": "/", "required": True},
-            "TARGET_TYPE": {"value": "PHP", "required": True},
+            "TARGET_TYPE": {"value": "Node", "required": True},
             "METHOD": {"value": "GET", "required": True},
             "HEADER": {"value": "EXPLOIT", "required": True}
         }
@@ -32,6 +33,7 @@ class LocalCommandProcessor(CommandProcessor):
     """
     @brief exploit the target machine.
     @param options Not used.
+    @pre the TARGET_TYPE is a valid target type.
     @pre the required exploit variables have been set, and are valid.
     @throw CommandException if the pre-condition is not met.
     """
@@ -46,12 +48,20 @@ class LocalCommandProcessor(CommandProcessor):
                f"{self.variables['TARGET_HOST']['value']} "
                f"at {self.variables['TARGET_PATH']['value']}"))
         
-        self.exploit = (
-            PHPExploitProcessor(self.variables['TARGET_HOST']['value'],
-                             self.variables['TARGET_PATH']['value'],
-                             self.variables['METHOD']['value'],
-                             self.variables['HEADER']['value']))
-        
+        if (self.variables['TARGET_TYPE']['value'].upper() == 'PHP'):
+            self.exploit = (
+                PHPExploitProcessor(self.variables['TARGET_HOST']['value'],
+                                    self.variables['TARGET_PATH']['value'],
+                                    self.variables['METHOD']['value'],
+                                    self.variables['HEADER']['value']))
+        elif (self.variables['TARGET_TYPE']['value'].upper() == 'NODE'):
+            self.exploit = (
+                NodeExploitProcessor(self.variables['TARGET_HOST']['value'],
+                                     self.variables['TARGET_PATH']['value'],
+                                     self.variables['METHOD']['value'],
+                                     self.variables['HEADER']['value']))
+        else:
+            raise CommandException("TARGET_TYPE is not supported.");
     """
     @brief Command to set and display exploit variables.
     @param options the variable to be set and the value, if any.
