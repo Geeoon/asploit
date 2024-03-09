@@ -112,4 +112,3 @@ class LocalCommandProcessor(CommandProcessor):
                 print("Disconnected from exploit shell.")
         else:
             super().process_command(command)
-    
