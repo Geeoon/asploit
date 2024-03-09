@@ -1,6 +1,3 @@
+# ASPLOIT
 Inspired by PHPSPLOIT
-
-1) Send requests to server with commands in http header
-
-2) Send base64 results in header
-
+This tool allows you to deploy and exploit backdoors with one line of code in Node and PHP servers.
