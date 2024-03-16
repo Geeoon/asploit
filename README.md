@@ -18,11 +18,10 @@ Any area where `EXPLOIT` or `exploit` is referenced can be replaced with any cus
 
 # Client
 ## Command and Controller
-The C2 runs on Python. To start, run `main.py` in at in the `src` folder.
+The C2 runs on Python. To start, run `main.py` in the `src` folder.
 
 # Creating Custom Backdoors/Exploits
 Coming soon.
-
 
 # Thank You
 This repository was inspired by [PHPSPLOIT](https://github.com/nil0x42/phpsploit).
