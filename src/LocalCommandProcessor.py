@@ -3,6 +3,14 @@ from CommandProcessor import CommandProcessor
 from ExploitProcessor import ExploitProcessor
 from PHPExploitProcessor import PHPExploitProcessor
 from NodeExploitProcessor import NodeExploitProcessor
+from FlaskExploitProcessor import FlaskExploitProcessor
+
+"""
+@brief The LocalCommandProcessor class is a class that accepts commands before
+        exploitation. It is used to set up the environment and exploit
+        variables.
+        Inherits from the CommandProcessor class.
+"""
 
 class LocalCommandProcessor(CommandProcessor):
     def __init__(self):
@@ -23,7 +31,7 @@ class LocalCommandProcessor(CommandProcessor):
         self.variables = {
             "TARGET_HOST": {"value": "localhost:8000", "required": True},
             "TARGET_PATH": {"value": "/", "required": True},
-            "TARGET_TYPE": {"value": "Node", "required": True},
+            "TARGET_TYPE": {"value": "flask", "required": True},
             "METHOD": {"value": "GET", "required": True},
             "HEADER": {"value": "EXPLOIT", "required": True}
         }
@@ -48,20 +56,26 @@ class LocalCommandProcessor(CommandProcessor):
                f"{self.variables['TARGET_HOST']['value']} "
                f"at {self.variables['TARGET_PATH']['value']}"))
         
-        if (self.variables['TARGET_TYPE']['value'].upper() == 'PHP'):
+        if self.variables['TARGET_TYPE']['value'].upper() == 'PHP':
             self.exploit = (
                 PHPExploitProcessor(self.variables['TARGET_HOST']['value'],
                                     self.variables['TARGET_PATH']['value'],
                                     self.variables['METHOD']['value'],
                                     self.variables['HEADER']['value']))
-        elif (self.variables['TARGET_TYPE']['value'].upper() == 'NODE'):
+        elif self.variables['TARGET_TYPE']['value'].upper() == 'NODE':
             self.exploit = (
                 NodeExploitProcessor(self.variables['TARGET_HOST']['value'],
                                      self.variables['TARGET_PATH']['value'],
                                      self.variables['METHOD']['value'],
                                      self.variables['HEADER']['value']))
+        elif self.variables['TARGET_TYPE']['value'].upper() == 'FLASK':
+            self.exploit = (
+                FlaskExploitProcessor(self.variables['TARGET_HOST']['value'],
+                                      self.variables['TARGET_PATH']['value'],
+                                      self.variables['METHOD']['value'],
+                                      self.variables['HEADER']['value']))
         else:
-            raise CommandException("TARGET_TYPE is not supported.");
+            raise CommandException("TARGET_TYPE is not supported.")
     """
     @brief Command to set and display exploit variables.
     @param options the variable to be set and the value, if any.
