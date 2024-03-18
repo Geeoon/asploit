@@ -4,6 +4,7 @@ from ExploitProcessor import ExploitProcessor
 from PHPExploitProcessor import PHPExploitProcessor
 from NodeExploitProcessor import NodeExploitProcessor
 from FlaskExploitProcessor import FlaskExploitProcessor
+from ASPClassicExploitProcessor import ASPClassicExploitProcessor
 
 """
 @brief The LocalCommandProcessor class is a class that accepts commands before
@@ -31,7 +32,7 @@ class LocalCommandProcessor(CommandProcessor):
         self.variables = {
             "TARGET_HOST": {"value": "localhost:8000", "required": True},
             "TARGET_PATH": {"value": "/", "required": True},
-            "TARGET_TYPE": {"value": "flask", "required": True},
+            "TARGET_TYPE": {"value": "classic asp", "required": True},
             "METHOD": {"value": "GET", "required": True},
             "HEADER": {"value": "EXPLOIT", "required": True}
         }
@@ -74,6 +75,12 @@ class LocalCommandProcessor(CommandProcessor):
                                       self.variables['TARGET_PATH']['value'],
                                       self.variables['METHOD']['value'],
                                       self.variables['HEADER']['value']))
+        elif self.variables['TARGET_TYPE']['value'].upper() == 'CLASSIC ASP':
+            self.exploit = (
+                ASPClassicExploitProcessor(self.variables['TARGET_HOST']['value'],
+                                           self.variables['TARGET_PATH']['value'],
+                                           self.variables['METHOD']['value'],
+                                           self.variables['HEADER']['value']))
         else:
             raise CommandException("TARGET_TYPE is not supported.")
     """
