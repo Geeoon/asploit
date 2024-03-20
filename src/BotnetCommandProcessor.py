@@ -1,4 +1,5 @@
 import json  # parse file and export
+from time import time  # export timestamp
 from pathlib import Path  # parse file and export
 from Exceptions import *
 from CommandProcessor import CommandProcessor
@@ -42,6 +43,11 @@ class BotnetCommandProcessor(CommandProcessor):
             "usage": ("load path\n"
                       "    path: the path to the a JSON file containing the "
                       "targets, relative to the path this script is ran.")
+        }
+        self.commands["export"] = {
+            "method": self.__export,
+            "description": "Export a timestamped file with all the targets.",
+            "usage": "export\n"
         }
         
     """
@@ -126,16 +132,31 @@ class BotnetCommandProcessor(CommandProcessor):
             try:
                 data = json.load(open(path))
                 for target in data["targets"]:
-                    self.__add(self, (f"{target['name']} "
-                                      f"{target['host']} "
-                                      f"{target['path']} "
-                                      f"{target['type']} "
-                                      f"{target['method']} "
-                                      f"{target['header']}"))
+                    self.__add((f"{target['name']} "
+                                f"{target['host']} "
+                                f"{target['path']} "
+                                f"{target['type']} "
+                                f"{target['method']} "
+                                f"{target['header']}"))
             except:
                 raise CommandException("Could not parse file.")
         else:
             raise CommandException("File does not exist.")
+
+    """
+    @brief Exports targets as JSON onto disk with timestamp.
+    @param options not used.
+    @post a file named "botnet-[unix_timestamp].json" is saved to disk in the
+            same directory that the script is ran in.
+    @throw CommandException if the targets could not be saved.
+    """
+    def __export(self, options: str):
+        timestamp = int(time())
+        out = {
+            "targets": self.targets
+        }
+        with open(f"botnet-{timestamp}.json", 'w') as f:
+            json.dump(out, f, ensure_ascii=False, indent=4)
 
     """
     @brief See base class for details.
