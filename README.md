@@ -32,8 +32,18 @@ Any area where `EXPLOIT` or `exploit` is referenced can be replaced with any cus
 ## Command and Controller
 The C2 runs on Python. To start, run `main.py` in the `src` folder.
 
-# Creating Custom Backdoors/Exploits
-Coming soon.
+# Custom Backdoors/Exploits
+## Loading Extensions
+Load extensions using the `loadext` command before entering an exploit shell.
 
+Run `help loadext` for more details.
+
+## Creating Extensions
+To make a custom exploit/extension, create a Python module containing a class/classes that extends the ExploitProcessor class.
+
+View the `PHPExploitProcessor` in the `src` folder for an example of the implementation.
+
+# Contributing
+Any help in this project would be appreciated, and feel free to make pull requests for any custom extensions you create.
 # Thank You
 This repository was inspired by [PHPSPLOIT](https://github.com/nil0x42/phpsploit).
