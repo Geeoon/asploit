@@ -18,7 +18,7 @@ if __name__ == "__main__":
             command = input(pre)
             try:
                 processor.process_command(command)
-            except CommandException as e:
+            except (CommandException, ExtensionException) as e:
                 print(str(e))
     except ExitException:
         print("Exiting...")

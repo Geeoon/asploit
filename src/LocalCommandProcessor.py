@@ -1,3 +1,8 @@
+import importlib.util  # dynamic import
+import sys  # dynamic import
+import os  # dynamic import
+import inspect  # dynamic import
+from pathlib import Path  # dynamic import
 from Exceptions import *
 from CommandProcessor import CommandProcessor
 from ExploitProcessor import ExploitProcessor
@@ -15,7 +20,7 @@ from ASPClassicExploitProcessor import ASPClassicExploitProcessor
 
 class LocalCommandProcessor(CommandProcessor):
     def __init__(self):
-        self.exploitModules = [ASPClassicExploitProcessor,
+        self.exploitClasses = [ASPClassicExploitProcessor,
                                FlaskExploitProcessor,
                                NodeExploitProcessor,
                                PHPExploitProcessor]
@@ -65,16 +70,17 @@ class LocalCommandProcessor(CommandProcessor):
                f"{self.variables['TARGET_HOST']['value']} "
                f"at {self.variables['TARGET_PATH']['value']}"))
         
-        for exploitModule in self.exploitModules:
+        for exploitClass in self.exploitClasses:
             if (self.variables['TARGET_TYPE']['value'].upper()
-                                  == exploitModule.get_name().upper()):
-                self.exploit = (exploitModule(
+                                  == exploitClass.get_name().upper()):
+                self.exploit = (exploitClass(
                                     self.variables['TARGET_HOST']['value'],
                                     self.variables['TARGET_PATH']['value'],
                                     self.variables['METHOD']['value'],
                                     self.variables['HEADER']['value']))
                 return
         raise CommandException("TARGET_TYPE is not supported.")
+
     """
     @brief Command to set and display exploit variables.
     @param options the variable to be set and the value, if any.
@@ -109,11 +115,25 @@ class LocalCommandProcessor(CommandProcessor):
     """
     def __loadext(self, options: str):
         try:
-            pass
+            modulePath = Path(options)
+            spec = importlib.util.spec_from_file_location(
+                    modulePath.stem,
+                    modulePath.resolve())
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            for name, obj in inspect.getmembers(module):
+                if (inspect.isclass(obj) and 
+                    issubclass(obj, ExploitProcessor) and 
+                    name != "ExploitProcessor"):
+                    for exploit in self.exploitClasses:
+                        if exploit.get_name() == obj.get_name():
+                            raise ExtensionException(
+                                "Already loaded extension of same name")
+                    self.exploitClasses.append(obj)
         except (CommandException, ExtensionException) as e:
             raise e
         except Exception:
-            raise ExtensionException("Couldn't load extension.")
+            raise ExtensionException("Couldn't load extension, check the path.")
         pass
 
     """
