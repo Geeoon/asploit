@@ -15,8 +15,13 @@ from ASPClassicExploitProcessor import ASPClassicExploitProcessor
 
 class LocalCommandProcessor(CommandProcessor):
     def __init__(self):
+        self.exploitModules = [ASPClassicExploitProcessor,
+                               FlaskExploitProcessor,
+                               NodeExploitProcessor,
+                               PHPExploitProcessor]
+        self.exploit: ExploitProcessor = None
+        
         super().__init__()
-
         self.commands["exploit"] = { 
                 "method": self.__exploit,
                 "description": ("Start the exploit, "
@@ -41,8 +46,6 @@ class LocalCommandProcessor(CommandProcessor):
             "METHOD": {"value": "GET", "required": True},
             "HEADER": {"value": "EXPLOIT", "required": True}
         }
-
-        self.exploit: ExploitProcessor = None
         
     """
     @brief exploit the target machine.
@@ -61,6 +64,7 @@ class LocalCommandProcessor(CommandProcessor):
         print((f"Attempting to exploit "
                f"{self.variables['TARGET_HOST']['value']} "
                f"at {self.variables['TARGET_PATH']['value']}"))
+        
         
         if self.variables['TARGET_TYPE']['value'].upper() == 'PHP':
             self.exploit = (
