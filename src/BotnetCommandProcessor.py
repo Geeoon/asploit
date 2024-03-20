@@ -11,7 +11,8 @@ from CommandProcessor import CommandProcessor
         Inherits from the CommandProcessor class.
 """
 class BotnetCommandProcessor(CommandProcessor):
-    def __init__(self):
+    def __init__(self, classes):
+        self.exploitClasses = classes
         self.targets = []
         super().__init__()
         self.commands["add"] = {
@@ -49,7 +50,12 @@ class BotnetCommandProcessor(CommandProcessor):
             "description": "Export a timestamped file with all the targets.",
             "usage": "export\n"
         }
-
+        self.commands["status"] = {
+            "method": self.__status,
+            "description": "Get the status of all the target(s).",
+            "usage": ("export [name]...\n"
+                      "    name: a space seperated list of target names")
+        }
         
     """
     @brief Add a target to the list of targets.
@@ -64,13 +70,26 @@ class BotnetCommandProcessor(CommandProcessor):
             print("'*' name not allowed.")
         if name in map(lambda host : host["name"], self.targets):
             raise CommandException(f"'{name}' already in targets.")
+        
+        typeClass = next((t for t in self.exploitClasses if t.get_name().upper()
+                           == target_type.upper()), None)
+        if not typeClass:
+            raise CommandException(f"'{name}' is of an unsupported type.")
+        
+        processor = None
+        try:
+            processor = typeClass(host, path, method, header)
+        except CommandException as e:
+            print(f"{name}: {str(e)}")
+
         self.targets.append({
             "name": name,
             "host": host,
             "path": path,
             "type": target_type,
             "method": method,
-            "header": header
+            "header": header,
+            "processor": processor
         })
 
     """
@@ -156,12 +175,33 @@ class BotnetCommandProcessor(CommandProcessor):
     """
     def __export(self, options: str):
         timestamp = int(time())
+        outTargets = []
+        for target in self.targets:
+            outTarget = {}
+            for key in target.keys():
+                if key != "processor":
+                    outTarget[key] = target[key]
+            outTargets.append(outTarget)
         out = {
-            "targets": self.targets
+            "targets": outTargets
         }
         with open(f"botnet-{timestamp}.json", 'w') as f:
             json.dump(out, f, ensure_ascii=False, indent=4)
 
+    """
+    @brief Get the status of the target(s)
+    @param options a comma seperated list of the targets, or nothing.
+    """
+    def __status(self, options: str):
+        names = []
+        if len(options) == 0:
+            names = map(lambda host : host["name"], self.targets)
+        else:
+            names = options.split(" ")
+
+        for name in names:
+            pass
+            
     """
     @brief See base class for details.
     """

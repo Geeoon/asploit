@@ -156,8 +156,8 @@ class LocalCommandProcessor(CommandProcessor):
 
     def __botnet(self, options: str):
         print("Switching to botnet mode...")
-        self.exploit = BotnetCommandProcessor()
-        pass
+        self.exploit = BotnetCommandProcessor(self.exploitClasses)
+
     """
     @brief Getter for exploit status (True or False)
     @return bool for if we are in the exploit shell.
