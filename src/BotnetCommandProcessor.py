@@ -1,3 +1,5 @@
+import json  # parse file and export
+from pathlib import Path  # parse file and export
 from Exceptions import *
 from CommandProcessor import CommandProcessor
 """
@@ -34,6 +36,13 @@ class BotnetCommandProcessor(CommandProcessor):
                       "    names: a space seperated list of the names of the"
                       " targets to be removed.")
         }
+        self.commands["load"] = {
+            "method": self.__load,
+            "description": "Load targets from file.",
+            "usage": ("load path\n"
+                      "    path: the path to the a JSON file containing the "
+                      "targets, relative to the path this script is ran.")
+        }
         
     """
     @brief Add a target to the list of targets.
@@ -44,8 +53,10 @@ class BotnetCommandProcessor(CommandProcessor):
             raise CommandException("Incorrect usage. "
                                    "Run 'help add' for usage.")
         name, host, path, target_type, method, header = options.split(" ")
+        if name == "*":
+            print("'*' name not allowed.")
         if name in map(lambda host : host["name"], self.targets):
-            raise CommandException("Name already in list.")
+            raise CommandException(f"'{name}' already in targets.")
         self.targets.append({
             "name": name,
             "host": host,
@@ -61,18 +72,20 @@ class BotnetCommandProcessor(CommandProcessor):
     """
     def __list(self, options: str):
         if len(self.targets) == 0:
-            raise CommandException("No hosts added.")
+            raise CommandException("No targets added.")
 
         print(self.targets[0]["name"])
         print(f"{self.targets[0]['host']}{self.targets[0]['path']}")
-        print(self.targets[0]["type"])
-        print(self.targets[0]["header"])
+        print(f"Type: {self.targets[0]['type']}")
+        print(f"Method: {self.targets[0]['method']}")
+        print(f"Header: {self.targets[0]['header']}")
         for target in self.targets[1:]:
             print("-" * 80)
             print(target["name"])
             print(f"{target['host']}{target['path']}")
-            print(target["type"])
-            print(target["header"])
+            print(f"Type: {target['type']}")
+            print(f"Method: {target['method']}")
+            print(f"Header: {target['header']}")
         print(f"\nTotal: {len(self.targets)}")
 
     """
@@ -83,14 +96,46 @@ class BotnetCommandProcessor(CommandProcessor):
     def __remove(self, options: str):
         if len(options) == 0:
             raise CommandException("Nothing to be removed.")
+        names = options.split(" ")
 
-        for name in options.split(" "):
+        if "*" in names:
+            choice = input("Remove all targets? [y/N] ")
+            if not choice.lower().startswith('y'):
+                return
+            self.targets = []
+            return
+        
+        for name in names:
             target = next((t for t in self.targets if t["name"] == name), None)
             if target:
                 print(f"Removing '{name}'.")
                 self.targets.remove(target)
             else:
                 print(f"'{name}' not found in targets.")
+    
+    """
+    @brief Load targets from a file.
+    @param options the path to the file.
+    @throw CommandException if the file couldn't be targets couldn't be loaded.
+    """
+    def __load(self, options: str):
+        if len(options) == 0:
+            raise CommandException("No path given.")
+        path = Path(options)
+        if path.exists() and path.is_file():
+            try:
+                data = json.load(open(path))
+                for target in data["targets"]:
+                    self.__add(self, (f"{target['name']} "
+                                      f"{target['host']} "
+                                      f"{target['path']} "
+                                      f"{target['type']} "
+                                      f"{target['method']} "
+                                      f"{target['header']}"))
+            except:
+                raise CommandException("Could not parse file.")
+        else:
+            raise CommandException("File does not exist.")
 
     """
     @brief See base class for details.
