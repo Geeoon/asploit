@@ -9,7 +9,7 @@ from CommandProcessor import CommandProcessor
 """
 class BotnetCommandProcessor(CommandProcessor):
     def __init__(self):
-        self.hosts = []
+        self.targets = []
         super().__init__()
         self.commands["add"] = {
                 "method": self.__add,
@@ -22,6 +22,11 @@ class BotnetCommandProcessor(CommandProcessor):
                           "    method: the HTTP method for the backdoor.\n"
                           "    header: the HTTP header to communicate over.")
             }
+        self.commands["list"] = {
+                "method": self.__list,
+                "description": "List all the targets.",
+                "usage": ("list")
+        }
         
     """
     @brief Add a target to the list of targets.
@@ -32,7 +37,9 @@ class BotnetCommandProcessor(CommandProcessor):
             raise CommandException("Incorrect usage. "
                                    "Run 'help add' for usage.")
         name, host, path, target_type, method, header = options.split(" ")
-        self.hosts.append({
+        if name in map(lambda host : host["name"], self.targets):
+            raise CommandException("Name already in list.")
+        self.targets.append({
             "name": name,
             "host": host,
             "path": path,
@@ -40,7 +47,24 @@ class BotnetCommandProcessor(CommandProcessor):
             "method": method,
             "header": header
         })
-        print(self.hosts)
+
+    """
+    @brief List all of the hosts
+    """
+    def __list(self, options: str):
+        if len(self.targets) == 0:
+            raise CommandException("No hosts added.")
+
+        print(self.targets[0]["name"])
+        print(f"{self.targets[0]['host']}{self.targets[0]['path']}")
+        print(self.targets[0]["type"])
+        print(self.targets[0]["header"])
+        for target in self.targets[1:]:
+            print("-" * 80)
+            print(target["name"])
+            print(f"{target['host']}{target['path']}")
+            print(target["type"])
+            print(target["header"])
 
     """
     @brief See base class for details.
