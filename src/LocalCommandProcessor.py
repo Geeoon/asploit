@@ -45,6 +45,12 @@ class LocalCommandProcessor(CommandProcessor):
                 "usage": ("loadext path\n"
                           "    path: path to the extension.")
         }
+
+        self.commands["botnet"] = {
+                "method": self.__botnet,
+                "description": "Switch to botnet mode.",
+                "usage": "botnet"
+        }
             
         # exploit variables
         self.variables = {
@@ -54,6 +60,14 @@ class LocalCommandProcessor(CommandProcessor):
             "METHOD": {"value": "GET", "required": True},
             "HEADER": {"value": "EXPLOIT", "required": True}
         }
+
+    """
+    @brief See base class for details.
+    """
+    def _Base__get_prefix(self):
+        if self.exploit:
+            return self.exploit._Base__get_prefix()
+        return super()._Base__get_prefix()
         
     """
     @brief exploit the target machine.
@@ -139,6 +153,9 @@ class LocalCommandProcessor(CommandProcessor):
             raise ExtensionException("Couldn't load extension, check the path.")
         pass
 
+    def __botnet(self, options: str):
+        print("Switching to botnet mode...")
+        pass
     """
     @brief Getter for exploit status (True or False)
     @return bool for if we are in the exploit shell.

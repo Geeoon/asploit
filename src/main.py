@@ -12,10 +12,7 @@ if __name__ == "__main__":
         print("Welcome to asploit.")
         print("For help, run 'help'")
         while (True):
-            pre = " > "
-            if processor.exploit_status():
-                pre = "sploit > "
-            command = input(pre)
+            command = input(processor._Base__get_prefix())
             try:
                 processor.process_command(command)
             except (CommandException, ExtensionException) as e:

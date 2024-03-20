@@ -51,6 +51,13 @@ class CommandProcessor():
                 raise CommandException(f"    '{options}' command not found.")
 
     """
+    @brief Getter for the prefix to be shown when typing commands.
+    @return the prefix
+    """
+    def _Base__get_prefix(self):
+        return " > "
+
+    """
     @brief Command to clear screen.
     @param options Not used.
     """
