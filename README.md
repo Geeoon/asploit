@@ -2,6 +2,8 @@
 This tool allows you to deploy and exploit backdoors with one line of code in Classic ASP, Flask, NodeJS, and PHP servers.
 
 # Backdoor
+## Backdoor Genreation Script
+Use the `create_backdoor.sh` script to generate the one line backdoor. The following is for reference.
 ## Classic ASP
 Add the following line to the top of the file you want to have the backdoor
 ```
