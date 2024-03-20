@@ -27,6 +27,11 @@ class LocalCommandProcessor(CommandProcessor):
                 "method": self.__set,
                 "description": "Set or display exploit variables."
             }
+
+        self.commands["loadext"] = {
+                "method": self.__loadext,
+                "description": "Load an extension."
+        }
             
         # exploit variables
         self.variables = {
@@ -109,6 +114,14 @@ class LocalCommandProcessor(CommandProcessor):
                 print(f"'{var}' set to '{value}'")
             else:
                 raise CommandException(f"'{var}' is not a variable.")
+            
+    """
+    @brief Loan an external extension (an exploit processor).
+    @param options the path to the extension.
+    @throw ExtensionException if the extension couldn't be loaded properly.
+    """
+    def __loadext(self, options: str):
+        pass
 
     """
     @brief Getter for exploit status (True or False)
