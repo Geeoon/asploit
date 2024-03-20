@@ -9,7 +9,7 @@ from LocalCommandProcessor import LocalCommandProcessor
 if __name__ == "__main__":
     processor = LocalCommandProcessor()
     try:
-        print("Welcome to ASPLOIT.")
+        print("Welcome to asploit.")
         print("For help, run 'help'")
         while (True):
             pre = " > "
