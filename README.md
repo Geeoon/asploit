@@ -1,4 +1,4 @@
-# ASPLOIT
+# asploit
 This tool allows you to deploy and exploit backdoors with one line of code in Classic ASP, Flask, NodeJS, and PHP servers.
 
 # Backdoor
@@ -29,8 +29,14 @@ Replace `res` with the `ServerResponse` parameter name, and replace `req` with t
 Any area where `EXPLOIT` or `exploit` is referenced can be replaced with any custom HTTP header (eg. for PHP, `HTTP_EXPLOIT` -> `HTTP_ANYTHINGYOUWANT`).
 
 # Client
+## Help
+Type `help` to list all commands in the current shell. Changes depending on whether or not you've entered a botnet or exploit shell.
+
 ## Command and Controller
 The C2 runs on Python. To start, run `main.py` in the `src` folder.
+
+## Botnet Controlling
+To control multiple backdoors at once, type `botnet` to enter the botnet mode.
 
 # Custom Backdoors/Exploits
 ## Loading Extensions
@@ -45,5 +51,6 @@ View the `PHPExploitProcessor` in the `src` folder for an example of the impleme
 
 # Contributing
 Any help in this project would be appreciated, and feel free to make pull requests for any custom extensions you create.
+
 # Thank You
 This repository was inspired by [PHPSPLOIT](https://github.com/nil0x42/phpsploit).
