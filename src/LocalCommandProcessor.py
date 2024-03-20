@@ -15,7 +15,6 @@ from ASPClassicExploitProcessor import ASPClassicExploitProcessor
         variables.
         Inherits from the CommandProcessor class.
 """
-
 class LocalCommandProcessor(CommandProcessor):
     def __init__(self):
         self.exploitClasses = [ASPClassicExploitProcessor,
@@ -132,7 +131,7 @@ class LocalCommandProcessor(CommandProcessor):
                     for exploit in self.exploitClasses:
                         if exploit.get_name() == obj.get_name():
                             raise ExtensionException(
-                                "Already loaded extension of same name")
+                                "Already loaded extension of same type.")
                     self.exploitClasses.append(obj)
         except (CommandException, ExtensionException) as e:
             raise e
