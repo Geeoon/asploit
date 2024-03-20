@@ -42,7 +42,7 @@ class LocalCommandProcessor(CommandProcessor):
         self.variables = {
             "TARGET_HOST": {"value": "localhost:8000", "required": True},
             "TARGET_PATH": {"value": "/", "required": True},
-            "TARGET_TYPE": {"value": "classic asp", "required": True},
+            "TARGET_TYPE": {"value": "PHP", "required": True},
             "METHOD": {"value": "GET", "required": True},
             "HEADER": {"value": "EXPLOIT", "required": True}
         }
@@ -65,33 +65,16 @@ class LocalCommandProcessor(CommandProcessor):
                f"{self.variables['TARGET_HOST']['value']} "
                f"at {self.variables['TARGET_PATH']['value']}"))
         
-        
-        if self.variables['TARGET_TYPE']['value'].upper() == 'PHP':
-            self.exploit = (
-                PHPExploitProcessor(self.variables['TARGET_HOST']['value'],
+        for exploitModule in self.exploitModules:
+            if (self.variables['TARGET_TYPE']['value'].upper()
+                                  == exploitModule.get_name().upper()):
+                self.exploit = (exploitModule(
+                                    self.variables['TARGET_HOST']['value'],
                                     self.variables['TARGET_PATH']['value'],
                                     self.variables['METHOD']['value'],
                                     self.variables['HEADER']['value']))
-        elif self.variables['TARGET_TYPE']['value'].upper() == 'NODE':
-            self.exploit = (
-                NodeExploitProcessor(self.variables['TARGET_HOST']['value'],
-                                     self.variables['TARGET_PATH']['value'],
-                                     self.variables['METHOD']['value'],
-                                     self.variables['HEADER']['value']))
-        elif self.variables['TARGET_TYPE']['value'].upper() == 'FLASK':
-            self.exploit = (
-                FlaskExploitProcessor(self.variables['TARGET_HOST']['value'],
-                                      self.variables['TARGET_PATH']['value'],
-                                      self.variables['METHOD']['value'],
-                                      self.variables['HEADER']['value']))
-        elif self.variables['TARGET_TYPE']['value'].upper() == 'CLASSIC ASP':
-            self.exploit = (
-                ASPClassicExploitProcessor(self.variables['TARGET_HOST']['value'],
-                                           self.variables['TARGET_PATH']['value'],
-                                           self.variables['METHOD']['value'],
-                                           self.variables['HEADER']['value']))
-        else:
-            raise CommandException("TARGET_TYPE is not supported.")
+                return
+        raise CommandException("TARGET_TYPE is not supported.")
     """
     @brief Command to set and display exploit variables.
     @param options the variable to be set and the value, if any.
@@ -125,6 +108,12 @@ class LocalCommandProcessor(CommandProcessor):
     @throw ExtensionException if the extension couldn't be loaded properly.
     """
     def __loadext(self, options: str):
+        try:
+            pass
+        except (CommandException, ExtensionException) as e:
+            raise e
+        except Exception:
+            raise ExtensionException("Couldn't load extension.")
         pass
 
     """
