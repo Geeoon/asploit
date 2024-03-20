@@ -8,6 +8,7 @@ from PHPExploitProcessor import PHPExploitProcessor
 from NodeExploitProcessor import NodeExploitProcessor
 from FlaskExploitProcessor import FlaskExploitProcessor
 from ASPClassicExploitProcessor import ASPClassicExploitProcessor
+from BotnetCommandProcessor import BotnetCommandProcessor
 
 """
 @brief The LocalCommandProcessor class is a class that accepts commands before
@@ -155,6 +156,7 @@ class LocalCommandProcessor(CommandProcessor):
 
     def __botnet(self, options: str):
         print("Switching to botnet mode...")
+        self.exploit = BotnetCommandProcessor()
         pass
     """
     @brief Getter for exploit status (True or False)
@@ -176,6 +178,5 @@ class LocalCommandProcessor(CommandProcessor):
                 self.exploit.process_command(command)
             except ExitException:
                 self.exploit = None
-                print("Disconnected from exploit shell.")
         else:
             super().process_command(command)
