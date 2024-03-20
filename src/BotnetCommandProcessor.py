@@ -49,6 +49,7 @@ class BotnetCommandProcessor(CommandProcessor):
             "description": "Export a timestamped file with all the targets.",
             "usage": "export\n"
         }
+
         
     """
     @brief Add a target to the list of targets.
@@ -132,12 +133,15 @@ class BotnetCommandProcessor(CommandProcessor):
             try:
                 data = json.load(open(path))
                 for target in data["targets"]:
-                    self.__add((f"{target['name']} "
-                                f"{target['host']} "
-                                f"{target['path']} "
-                                f"{target['type']} "
-                                f"{target['method']} "
-                                f"{target['header']}"))
+                    try:
+                        self.__add((f"{target['name']} "
+                                    f"{target['host']} "
+                                    f"{target['path']} "
+                                    f"{target['type']} "
+                                    f"{target['method']} "
+                                    f"{target['header']}"))
+                    except CommandException as e:
+                        print(str(e))
             except:
                 raise CommandException("Could not parse file.")
         else:
