@@ -13,15 +13,20 @@ class CommandProcessor():
         self.commands = {
             "help": { 
                 "method": self._Base__help,
-                "description": "Display the help screen."
+                "description": "Display the help screen and usage "
+                                    "for commands.",
+                "usage": ("help [command]\n"
+                          "    command: specific command to display")
             },
             "clear": {
                 "method": self._Base__clear,
-                "description": "Clear the screen."
+                "description": "Clear the screen.",
+                "usage": "clear"
             },
             "exit": {
                 "method": self.__exit,
-                "description": "Exit the program or exploit."
+                "description": "Exit the program or exploit.",
+                "usage": "exit"
             }
         }
 
@@ -39,8 +44,9 @@ class CommandProcessor():
                        f" {self.commands[command]['description']}"))
         else:  # look up specific command
             if options in self.commands:
-                print((f"    "
-                      f"{options}: {self.commands[options]['description']}"))
+                print((f"{options}: {self.commands[options]['description']}"))
+                print(f"Usage: {self.commands[options]['usage']}")
+                
             else:  # command does not exist
                 raise CommandException(f"    '{options}' command not found.")
 

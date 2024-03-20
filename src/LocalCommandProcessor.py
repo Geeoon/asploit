@@ -1,6 +1,4 @@
 import importlib.util  # dynamic import
-import sys  # dynamic import
-import os  # dynamic import
 import inspect  # dynamic import
 from pathlib import Path  # dynamic import
 from Exceptions import *
@@ -30,17 +28,23 @@ class LocalCommandProcessor(CommandProcessor):
         self.commands["exploit"] = { 
                 "method": self.__exploit,
                 "description": ("Start the exploit, "
-                    "given the preconditions are met.")
+                    "given the preconditions are met."),
+                "usage": "exploit"
             }
         
         self.commands["set"] = {
                 "method": self.__set,
-                "description": "Set or display exploit variables."
+                "description": "Set or display exploit variables.",
+                "usage": ("set variable [value]\n"
+                          "    variable: variable to set.\n"
+                          "    value: value to set variable to.")
             }
 
         self.commands["loadext"] = {
                 "method": self.__loadext,
-                "description": "Load an extension."
+                "description": "Load an extension.",
+                "usage": ("loadext path\n"
+                          "    path: path to the extension.")
         }
             
         # exploit variables
