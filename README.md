@@ -23,7 +23,7 @@ To make a custom exploit/extension, create a Python module containing a class/cl
 
 View the `PHPExploitProcessor` in the `src` folder for an example of the implementation.
 # Backdoor
-## Backdoor Genreation Script
+## Backdoor Creation Script
 Use the `create_backdoor.sh` script to generate the one line backdoor. The following is for reference.
 ### Classic ASP
 Add the following line to the top of the file you want to have the backdoor
