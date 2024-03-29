@@ -55,7 +55,7 @@ class CommandProcessor():
     @return the prefix
     """
     def _Base__get_prefix(self):
-        return " > "
+        return "> "
 
     """
     @brief Command to clear screen.
