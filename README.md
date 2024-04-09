@@ -1,7 +1,7 @@
 # asploit
 This tool allows you to deploy and exploit backdoors with one line of code in Classic ASP, Flask, NodeJS, and PHP servers.
 
-As of April 9, 2024, the backdoor is detected by 0/59 virus scanners on [VirusTotal](https://www.virustotal.com/gui/file/ea41fc39434119f35c84308b78f9d7925eb754fbc1ef24e5253a7c5d04446502).
+As of April 9, 2024, the backdoor is detected by none of the malware scanners on [VirusTotal](https://www.virustotal.com/gui/file/ea41fc39434119f35c84308b78f9d7925eb754fbc1ef24e5253a7c5d04446502).
 
 Custom extensions can be created and installed to control any backdoored server.
 # Command and Controller
